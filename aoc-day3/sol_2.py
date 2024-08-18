@@ -8,6 +8,7 @@ with open(file_path, "r") as file:
     lines = file.readlines()
 
 lines = [line.rstrip() for line in lines]
+map = {}
 # 467..114..
 # ...*......
 # ..35..633.
@@ -19,7 +20,7 @@ lines = [line.rstrip() for line in lines]
 # ...$.*....
 # .664.598..
 
-def is_save(i,j):
+def is_gear(i,j):
     for k in range(len(adj_x)):
         adj_i = i + adj_x[k]
         adj_j = j + adj_y[k]
@@ -27,18 +28,19 @@ def is_save(i,j):
             continue
         # print("pair", adj_x[k], adj_y[k])
         # print("Current:", i, j, lines[i][j], "Adjacent:", adj_i, adj_j, lines[adj_i][adj_j])
-        if lines[adj_i][adj_j] not in whitelist:
-            return False
-    return True
+        if lines[adj_i][adj_j] == "*":
+            return (True, adj_j*len(lines[0]) + adj_i)
+    return (False, -1)
     
 
 def bfs(idx, i, j):
     # Check the adjacent cells in the 2D array
     for k in range(i,j):
-        if is_save(idx, k) == False:
-            return False
+        res = is_gear(idx, k)
+        if res[0]:
+            return (True, res[1])
             # Do something with the number
-    return True
+    return (False, -1)
 
 sum = 0
 for idx, val in enumerate(lines):
@@ -53,9 +55,12 @@ for idx, val in enumerate(lines):
             j += 1
         if i == j:
             continue
-        if not bfs(idx, i, j):
+        res=  bfs(idx, i, j)
+        if res[0]:
             print(int(lines[idx][i:j]))
-            sum += int(lines[idx][i:j])
+            if res[1] in map:
+                sum += map[res[1]] * int(lines[idx][i:j])
+            else:
+                map[res[1]] = int(lines[idx][i:j])
         i = j
-
 print(sum)
